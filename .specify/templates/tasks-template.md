@@ -62,12 +62,16 @@ description: "Task list template for feature implementation"
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
+- [ ] T004 Setup database schema and migrations framework with SQLModel
+- [ ] T005 [P] Implement JWT-based authentication/authorization framework with Better Auth
+- [ ] T006 [P] Setup API routing and middleware structure with FastAPI
 - [ ] T007 Create base models/entities that all stories depend on
 - [ ] T008 Configure error handling and logging infrastructure
 - [ ] T009 Setup environment configuration management
+- [ ] T010 [P] Implement centralized API client for frontend with JWT token attachment
+- [ ] T011 Setup Neon Serverless PostgreSQL connection
+- [ ] T012 Implement user-based data isolation with user_id extraction from JWT
+- [ ] T013 Configure Next.js 16+ App Router structure
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 

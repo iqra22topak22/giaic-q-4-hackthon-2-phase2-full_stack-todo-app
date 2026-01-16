@@ -1,55 +1,76 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report:
+- Version change: N/A (initial version) → 1.0.0
+- Added sections: Core Principles (6), Additional Constraints, Development Workflow, Governance
+- Templates requiring updates: N/A (initial creation)
+- Follow-up TODOs: None
+-->
+# Todo Web Application Phase II Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Spec-Driven Development (NON-NEGOTIABLE)
+Spec-Kit Plus methodology is mandatory: Specifications are the single source of truth for all development. No implementation may begin without approved, complete specifications. All features must be defined with clear requirements, acceptance criteria, and testable scenarios before any code is written.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Agentic Workflow (NON-NEGOTIABLE) 
+All development work must be performed through defined agents and skills. No manual coding or ad-hoc decisions are allowed. The Qwen CLI with Spec-Kit Plus agents (auth-security-agent, backend-api-agent, frontend-todo-agent, orchestrator-agent, spec-analyst) must be used for all implementation tasks.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Strict Phase Order (NON-NEGOTIABLE)
+Development phases must be followed in strict sequence without skipping: sp.constitution → sp.specify → sp.plan → sp.tasks → sp.implement. Each phase must be completed and approved before proceeding to the next. Implementation is forbidden before sp.tasks approval.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Security-First Architecture
+Security requirements take precedence over feature implementation. All authentication and authorization flows must be designed and validated before other functionality. JWT-based authentication with proper token validation and user-based data isolation are mandatory for all endpoints.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Frontend-Backend Separation
+Clear separation of concerns between frontend and backend: Frontend handles UI and user interactions only; Backend enforces all authorization and data validation. API contracts must be clearly defined and adhered to by both sides.
 
-### [PRINCIPLE_6_NAME]
+### VI. Test-First Development
+All code must be developed with tests written first. Unit tests, integration tests, and end-to-end tests must be created as part of the development process. Code without adequate test coverage will not be accepted.
 
+## Additional Constraints
 
-[PRINCIPLE__DESCRIPTION]
+### Technology Stack Requirements
+- Frontend: Next.js 16+ (App Router), TypeScript, Tailwind CSS
+- Backend: Python FastAPI
+- ORM: SQLModel
+- Database: Neon Serverless PostgreSQL
+- Authentication: Better Auth (Frontend) + JWT (Backend)
+- Monorepo structure must be preserved throughout development
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### Authentication & Security Requirements
+- All API endpoints require a valid JWT token
+- JWT tokens are issued by Better Auth on the frontend
+- Backend must verify JWT signature and expiry using a shared secret
+- user_id must be extracted from the JWT token only (never from request body, query params, or URL)
+- All task operations must be filtered by the authenticated user's ID
+- Requests without valid JWT must return 401 Unauthorized
+- Cross-user data access is strictly forbidden
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### API Behavior Standards
+- RESTful API conventions must be followed
+- All endpoints must be stateless
+- Responses must only include data belonging to the authenticated user
+- Proper HTTP status codes must be returned for all responses
+- API responses must follow consistent structure
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Development Workflow
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### Quality & Review Process
+- If specs are missing, unclear, or conflicting, implementation must be blocked
+- Security correctness has higher priority than feature completeness
+- Agents are allowed to request spec updates before proceeding
+- All code must pass through automated linting and type-checking
+- Peer review is required before merging any changes
+
+### Implementation Guidelines
+- Frontend: JWT token must be attached to every API request via Authorization header
+- Frontend: API calls must go through a centralized API client
+- Backend: SQLModel must be used for all database interactions
+- Backend: Environment variables must be used for secrets and configuration
+- No direct fetch in frontend components; all API calls must go through centralized client
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other development practices for Phase II of the Todo Web Application. All development activities must verify compliance with these principles. Any complexity must be justified against these principles. All pull requests and code reviews must verify constitutional compliance. This constitution is immutable for the remainder of Phase II and any amendments require explicit documentation, approval, and migration planning.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-01-07 | **Last Amended**: 2026-01-07

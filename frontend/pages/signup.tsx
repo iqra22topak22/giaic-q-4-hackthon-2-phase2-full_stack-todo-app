@@ -1,0 +1,202 @@
+import Head from 'next/head';
+import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { useAuth } from '../contexts/AuthContext';
+
+export default function Signup() {
+  const router = useRouter();
+  const { login } = useAuth();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    // Validation
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
+
+    if (!termsAccepted) {
+      setError('You must agree to the terms and conditions');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // In development mode, we'll use mock-user-id
+      if (process.env.NODE_ENV === 'development') {
+        // Use the auth context to handle login
+        login('mock-jwt-token', 'mock-user-id');
+        // Redirect to dashboard after successful signup
+        router.push('/dashboard');
+      } else {
+        // In production, you would make an actual API call here
+        // const response = await fetch('/api/signup', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify({ name, email, password })
+        // });
+        // const data = await response.json();
+
+        // For now, simulate a successful signup with mock data
+        login('mock-jwt-token', 'user-123');
+        router.push('/dashboard');
+      }
+    } catch (err) {
+      setError('An error occurred during signup. Please try again.');
+      console.error('Signup error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+      <Head>
+        <title>Sign Up - Todo App</title>
+        <meta name="description" content="Create a new todo account" />
+      </Head>
+
+      <div className="w-full max-w-md">
+        <div className="text-center mb-10">
+          <div className="mx-auto bg-blue-600 w-16 h-16 rounded-xl flex items-center justify-center mb-4">
+            <h1 className="text-2xl font-bold text-white">Todo</h1>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Create Account</h1>
+          <p className="text-gray-600 dark:text-gray-300 mt-2">Join us today to get started</p>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+          <div className="p-8">
+            {error && (
+              <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Full Name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  placeholder="John Doe"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Email Address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  placeholder="you@example.com"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Confirm Password
+                </label>
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  id="terms"
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
+                />
+                <label htmlFor="terms" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                  I agree to the Terms and Privacy Policy
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`w-full ${
+                  isLoading
+                    ? 'bg-blue-400 dark:bg-blue-500'
+                    : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700'
+                } text-white py-3 px-4 rounded-lg font-medium transition duration-200 transform hover:scale-[1.02]`}
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Creating account...
+                  </span>
+                ) : 'Create Account'}
+              </button>
+            </form>
+
+            <div className="mt-8 text-center">
+              <p className="text-gray-600 dark:text-gray-400">
+                Already have an account?{' '}
+                <Link href="/login" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 dark:bg-gray-700/50 px-8 py-6 text-center border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              By creating an account, you agree to our Terms and Privacy Policy.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

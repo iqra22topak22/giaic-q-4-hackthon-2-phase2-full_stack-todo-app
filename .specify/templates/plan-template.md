@@ -31,7 +31,35 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+### Spec-Driven Development Compliance
+- [ ] Feature specification is complete and approved
+- [ ] All requirements are clearly defined with acceptance criteria
+- [ ] No implementation has begun without approved specs
+
+### Agentic Workflow Compliance
+- [ ] Implementation plan uses defined agents and skills
+- [ ] No manual coding or ad-hoc decisions planned
+- [ ] Qwen CLI with Spec-Kit Plus agents will be used
+
+### Phase Order Compliance
+- [ ] This plan follows after sp.constitution and sp.specify phases
+- [ ] Implementation will wait for sp.tasks approval
+- [ ] No phases will be skipped in the development process
+
+### Security-First Architecture Compliance
+- [ ] Authentication and authorization flows are designed
+- [ ] JWT-based authentication is planned per constitution
+- [ ] User-based data isolation is addressed in design
+
+### Technology Stack Compliance
+- [ ] Plan adheres to required technology stack (Next.js 16+, FastAPI, SQLModel, Neon PostgreSQL, Better Auth)
+- [ ] Monorepo structure is preserved in the implementation plan
+- [ ] Frontend-backend separation principles are followed
+
+### Quality & Review Process Compliance
+- [ ] Test-first development approach is incorporated
+- [ ] Peer review process is planned for all changes
+- [ ] Automated linting and type-checking are included
 
 ## Project Structure
 
