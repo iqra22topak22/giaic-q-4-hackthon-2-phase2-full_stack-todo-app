@@ -38,7 +38,7 @@ export default function Dashboard() {
         throw new Error('User ID not found');
       }
 
-      const response = await apiClient.get(`/api/{user_id}/tasks`);
+      const response = await apiClient.get(`/api/${userId}/tasks`);
 
       if (response.data && response.data.tasks) {
         const mappedTasks: Task[] = response.data.tasks.map((backendTask: any) => ({
@@ -72,7 +72,7 @@ export default function Dashboard() {
         throw new Error('User ID not found');
       }
 
-      const response = await apiClient.post(`/api/{user_id}/tasks`, {
+      const response = await apiClient.post(`/api/${userId}/tasks`, {
         title: taskData.title,
         description: taskData.description,
         completed: taskData.status === 'completed'
@@ -108,7 +108,7 @@ export default function Dashboard() {
         throw new Error('User ID not found');
       }
 
-      const response = await apiClient.patch(`/api/{user_id}/tasks/${taskId}/complete`, {
+      const response = await apiClient.patch(`/api/${userId}/tasks/${taskId}/complete`, {
         completed: task.status !== 'completed'
       });
 
@@ -132,7 +132,7 @@ export default function Dashboard() {
         throw new Error('User ID not found');
       }
 
-      const response = await apiClient.put(`/api/{user_id}/tasks/${taskId}`, {
+      const response = await apiClient.put(`/api/${userId}/tasks/${taskId}`, {
         title: updatedTask.title,
         description: updatedTask.description,
         completed: updatedTask.status === 'completed'
@@ -164,7 +164,7 @@ export default function Dashboard() {
         throw new Error('User ID not found');
       }
 
-      await apiClient.delete(`/api/{user_id}/tasks/${taskId}`);
+      await apiClient.delete(`/api/${userId}/tasks/${taskId}`);
 
       setTasks(tasks.filter(t => t.id !== taskId));
     } catch (err: any) {
