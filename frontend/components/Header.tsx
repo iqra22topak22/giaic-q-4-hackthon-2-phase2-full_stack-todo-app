@@ -1,6 +1,6 @@
 import { signOut, getCurrentUserId } from '@/lib/auth';
 import { MoonIcon, SunIcon, LogOut } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@/contexts/theme-context';
 import { Button } from '@/components/ui/Button';
 
 export default function Header() {
