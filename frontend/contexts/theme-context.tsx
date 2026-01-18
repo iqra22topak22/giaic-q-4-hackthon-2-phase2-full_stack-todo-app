@@ -27,12 +27,12 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(() => {
-    // Check if we're in the browser
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
-    }
     // On the server, return the default theme
-    return defaultTheme;
+    if (typeof window === "undefined") {
+      return defaultTheme;
+    }
+    // On the client, get from localStorage
+    return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
   });
 
   useEffect(() => {
