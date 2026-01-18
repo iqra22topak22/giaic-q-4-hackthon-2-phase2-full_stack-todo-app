@@ -19,10 +19,25 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+import os
+
 # Configure CORS middleware
+allowed_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "https://full-stack-todo-iqra22topak22s-projects.vercel.app",  # Production Vercel URL
+]
+
+# Add any additional origins from environment variables
+cors_env_var = os.getenv("CORS_ALLOWED_ORIGINS") or os.getenv("ALLOWED_ORIGINS")
+if cors_env_var:
+    origins_list = [origin.strip() for origin in cors_env_var.split(",") if origin.strip()]
+    allowed_origins.extend(origins_list)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3001"],  # Allow Next.js frontend
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
