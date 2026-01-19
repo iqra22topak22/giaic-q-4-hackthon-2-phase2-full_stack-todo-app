@@ -6,7 +6,8 @@ from app.tasks.service import (
     create_task_for_user,
     update_task_for_user,
     delete_task_for_user,
-    toggle_task_completion
+    toggle_task_completion,
+    create_multiple_tasks_for_user
 )
 from app.tasks.schemas import (
     TaskCreate,
@@ -14,7 +15,9 @@ from app.tasks.schemas import (
     TaskResponse,
     TaskListResponse,
     TaskCompletionUpdate,
-    SuccessResponse
+    SuccessResponse,
+    BulkTaskCreateRequest,
+    BulkTaskCreateResponse
 )
 from app.database import get_async_session
 from app.core.security import get_current_user, security
@@ -486,4 +489,129 @@ async def toggle_task_completion_by_user_id(
             "created_at": updated_task.created_at.isoformat(),
             "updated_at": updated_task.updated_at.isoformat()
         }
+    )
+
+
+@router.post("/tasks/bulk", response_model=BulkTaskCreateResponse, status_code=status.HTTP_201_CREATED)
+async def create_multiple_tasks_with_auth(
+    bulk_request: BulkTaskCreateRequest,
+    current_user_id: str = Depends(get_current_user_optional),
+    session: AsyncSession = Depends(get_async_session)
+):
+    """
+    Create multiple tasks for the logged-in user (using auth).
+    """
+    # Validate input
+    if not bulk_request.tasks or len(bulk_request.tasks) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="At least one task must be provided"
+        )
+
+    if len(bulk_request.tasks) > 100:  # Limit bulk creation to 100 tasks at a time
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot create more than 100 tasks at once"
+        )
+
+    for task_data in bulk_request.tasks:
+        if not task_data.title or len(task_data.title.strip()) == 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Each task must have a non-empty title"
+            )
+
+        if task_data.description and len(task_data.description) > 1000:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Each task description must be 1000 characters or less"
+            )
+
+    created_tasks = await create_multiple_tasks_for_user(session, bulk_request.tasks, current_user_id)
+
+    # Convert to response format
+    task_responses = [
+        TaskResponse(
+            id=task.id,
+            user_id=task.user_id,
+            title=task.title,
+            description=task.description,
+            completed=task.completed,
+            created_at=task.created_at,
+            updated_at=task.updated_at
+        )
+        for task in created_tasks
+    ]
+
+    return BulkTaskCreateResponse(
+        success=True,
+        message=f"{len(created_tasks)} tasks created successfully",
+        data=task_responses
+    )
+
+
+@router.post("/{user_id}/tasks/bulk", response_model=BulkTaskCreateResponse, status_code=status.HTTP_201_CREATED)
+async def create_multiple_tasks_by_user_id(
+    user_id: str,
+    bulk_request: BulkTaskCreateRequest,
+    current_user_id: str = Depends(get_current_user_optional),
+    session: AsyncSession = Depends(get_async_session)
+):
+    """
+    Create multiple tasks for a specific user (matching auth user ID with path param).
+    """
+    # Verify that the user_id in the path matches the authenticated user
+    # For mock user ID, allow access to its own tasks
+    if user_id != current_user_id and not (user_id == "mock-user-id" and current_user_id == "mock-user-id"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: Cannot create tasks for another user"
+        )
+
+    # Validate input
+    if not bulk_request.tasks or len(bulk_request.tasks) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="At least one task must be provided"
+        )
+
+    if len(bulk_request.tasks) > 100:  # Limit bulk creation to 100 tasks at a time
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot create more than 100 tasks at once"
+        )
+
+    for task_data in bulk_request.tasks:
+        if not task_data.title or len(task_data.title.strip()) == 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Each task must have a non-empty title"
+            )
+
+        if task_data.description and len(task_data.description) > 1000:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Each task description must be 1000 characters or less"
+            )
+
+    created_tasks = await create_multiple_tasks_for_user(session, bulk_request.tasks, user_id)
+
+    # Convert to response format
+    task_responses = [
+        TaskResponse(
+            id=task.id,
+            user_id=task.user_id,
+            title=task.title,
+            description=task.description,
+            completed=task.completed,
+            created_at=task.created_at,
+            updated_at=task.updated_at
+        )
+        for task in created_tasks
+    ]
+
+    return BulkTaskCreateResponse(
+        success=True,
+        message=f"{len(created_tasks)} tasks created successfully",
+        data=task_responses
     )

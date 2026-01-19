@@ -46,3 +46,13 @@ class SuccessResponse(BaseModel):
 class ErrorResponse(BaseModel):
     success: bool
     error: dict
+
+
+class BulkTaskCreateRequest(BaseModel):
+    tasks: List[TaskCreate]
+
+
+class BulkTaskCreateResponse(BaseModel):
+    success: bool
+    message: str
+    data: List[TaskResponse]

@@ -1,10 +1,16 @@
 // Example frontend fetch code for interacting with the task API
 // These examples show how to make requests to the backend directly
+// Uses environment variable for the backend URL to work in both dev and prod
+
+// Helper function to get the backend API URL
+function getBackendApiUrl() {
+  return process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://127.0.0.1:8000';
+}
 
 // GET all tasks for a user
 export async function getTasks(userId) {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/${userId}/tasks`, {
+    const response = await fetch(`${getBackendApiUrl()}/api/${userId}/tasks`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -27,7 +33,7 @@ export async function getTasks(userId) {
 // POST a new task for a user
 export async function createTask(userId, taskData) {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/${userId}/tasks`, {
+    const response = await fetch(`${getBackendApiUrl()}/api/${userId}/tasks`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -51,7 +57,7 @@ export async function createTask(userId, taskData) {
 // GET a specific task for a user
 export async function getTask(userId, taskId) {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/${userId}/tasks/${taskId}`, {
+    const response = await fetch(`${getBackendApiUrl()}/api/${userId}/tasks/${taskId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -74,7 +80,7 @@ export async function getTask(userId, taskId) {
 // PUT (update) a specific task for a user
 export async function updateTask(userId, taskId, taskData) {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/${userId}/tasks/${taskId}`, {
+    const response = await fetch(`${getBackendApiUrl()}/api/${userId}/tasks/${taskId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -98,7 +104,7 @@ export async function updateTask(userId, taskId, taskData) {
 // DELETE a specific task for a user
 export async function deleteTask(userId, taskId) {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/${userId}/tasks/${taskId}`, {
+    const response = await fetch(`${getBackendApiUrl()}/api/${userId}/tasks/${taskId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -121,7 +127,7 @@ export async function deleteTask(userId, taskId) {
 // PATCH (toggle completion) for a specific task
 export async function toggleTaskCompletion(userId, taskId, completed) {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/${userId}/tasks/${taskId}/complete`, {
+    const response = await fetch(`${getBackendApiUrl()}/api/${userId}/tasks/${taskId}/complete`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

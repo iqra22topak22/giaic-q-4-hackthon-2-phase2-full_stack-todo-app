@@ -111,3 +111,27 @@ async def toggle_task_completion(session: AsyncSession, task_id: int, completed:
     await session.refresh(db_task)
 
     return db_task
+
+
+async def create_multiple_tasks_for_user(session: AsyncSession, tasks_create: List[TaskCreate], user_id: str):
+    """Create multiple tasks for a specific user."""
+    created_tasks = []
+
+    for task_create in tasks_create:
+        db_task = Task(
+            title=task_create.title,
+            description=task_create.description,
+            completed=task_create.completed,
+            user_id=user_id
+        )
+
+        session.add(db_task)
+        created_tasks.append(db_task)
+
+    await session.commit()
+
+    # Refresh all created tasks to get their IDs and timestamps
+    for task in created_tasks:
+        await session.refresh(task)
+
+    return created_tasks

@@ -26,28 +26,38 @@ export function ThemeProvider({
   storageKey = "vite-ui-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Check if we're in the browser
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
-    }
-    // On the server, return the default theme
-    return defaultTheme;
-  });
+  const [theme, setTheme] = useState<Theme>("light"); // Initialize with light theme
 
   useEffect(() => {
+    // On the client side, get the theme from localStorage or use default
+    const storedTheme = localStorage.getItem(storageKey) as Theme | null;
+    const initialTheme = storedTheme || defaultTheme;
+
+    setTheme(initialTheme);
+
+    // Apply the theme to the document element
     const root = window.document.documentElement;
-
     root.classList.remove("light", "dark");
-    root.classList.add(theme);
+    root.classList.add(initialTheme);
+  }, [storageKey, defaultTheme]);
 
-    localStorage.setItem(storageKey, theme);
+  useEffect(() => {
+    // Apply theme changes to the document element
+    if (typeof window !== "undefined") {
+      const root = window.document.documentElement;
+
+      root.classList.remove("light", "dark");
+      root.classList.add(theme);
+
+      // Save theme to localStorage
+      localStorage.setItem(storageKey, theme);
+    }
   }, [theme, storageKey]);
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      setTheme(theme);
+    setTheme: (newTheme: Theme) => {
+      setTheme(newTheme);
     },
   };
 
