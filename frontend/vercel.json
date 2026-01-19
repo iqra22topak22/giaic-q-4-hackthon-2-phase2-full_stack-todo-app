@@ -11,5 +11,8 @@
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ]
+  ],
+  "env": {
+    "NEXT_PUBLIC_BACKEND_API_URL": "https://backend-izaqpbqf1-iqra22topak22s-projects.vercel.app"
+  }
 }
