@@ -7,18 +7,46 @@ import os
 # Create the async database engine
 database_url = settings.DATABASE_URL
 
-# For SQLite, we need to handle the path properly
+# For Vercel deployments with PostgreSQL, we don't need special handling
+# For local SQLite, ensure the directory exists
 if database_url.startswith("sqlite+aiosqlite:///"):
     # Ensure the directory exists for SQLite file
     db_path = database_url.replace("sqlite+aiosqlite:///", "")
-    os.makedirs(os.path.dirname(os.path.abspath(db_path)), exist_ok=True)
+    # For Vercel, we'll skip creating directories since file system is ephemeral
+    if settings.ENVIRONMENT != "production":
+        os.makedirs(os.path.dirname(os.path.abspath(db_path)), exist_ok=True)
 
-# Create the async engine with appropriate settings for SQLite
-connect_args = {"check_same_thread": False} if database_url.startswith("sqlite") else {}
-engine = create_async_engine(database_url, echo=True, connect_args=connect_args)
+# Create the async engine with appropriate settings
+# For SQLite we need check_same_thread=False, for PostgreSQL we don't
+connect_args = {"check_same_thread": False} if "sqlite" in database_url else {}
+
+# Additional engine kwargs for PostgreSQL in production
+engine_kwargs = {}
+if "postgresql" in database_url.lower():
+    engine_kwargs.update({
+        "pool_size": 5,
+        "max_overflow": 10,
+        "pool_pre_ping": True,
+        "pool_recycle": 300
+    })
+
+engine = create_async_engine(
+    database_url,
+    echo=(settings.ENVIRONMENT == "development"),  # Only echo in development
+    connect_args=connect_args,
+    **engine_kwargs
+)
 
 async def create_db_and_tables():
     """Create database tables"""
+    # For Vercel deployments with external DB, we can create tables
+    # For SQLite on Vercel, table creation will happen but data won't persist
+    if "sqlite" in database_url and settings.ENVIRONMENT == "production":
+        # Skip table creation for SQLite in production on Vercel
+        # since the database is ephemeral
+        print("Skipping table creation for SQLite in production environment")
+        return
+
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
 

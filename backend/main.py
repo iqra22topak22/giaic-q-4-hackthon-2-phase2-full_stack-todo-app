@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from app.exceptions import add_exception_handlers
+from app.config import settings
 
 load_dotenv()
 
@@ -15,7 +16,12 @@ FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:3000")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    create_db_and_tables()
+    # For Vercel deployments with SQLite, skip table creation since it's ephemeral
+    if not (settings.DATABASE_URL.startswith("sqlite") and settings.ENVIRONMENT == "production"):
+        import asyncio
+        # Run the async function in the event loop
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(create_db_and_tables())
     yield
     # Shutdown (if needed)
 
