@@ -29,6 +29,11 @@ if "postgresql" in database_url.lower():
         "pool_pre_ping": True,
         "pool_recycle": 300
     })
+elif "sqlite" in database_url.lower():
+    # For SQLite, use memory database in production to avoid file system issues
+    if settings.ENVIRONMENT == "production":
+        database_url = "sqlite+aiosqlite:///:memory:"
+        connect_args = {"check_same_thread": False}
 
 engine = create_async_engine(
     database_url,
@@ -41,11 +46,9 @@ async def create_db_and_tables():
     """Create database tables"""
     # For Vercel deployments with external DB, we can create tables
     # For SQLite on Vercel, table creation will happen but data won't persist
-    if "sqlite" in database_url and settings.ENVIRONMENT == "production":
-        # Skip table creation for SQLite in production on Vercel
-        # since the database is ephemeral
-        print("Skipping table creation for SQLite in production environment")
-        return
+    if "sqlite" in settings.DATABASE_URL and settings.ENVIRONMENT == "production":
+        # Create tables in memory database for Vercel
+        print("Creating tables in memory database for Vercel deployment")
 
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)

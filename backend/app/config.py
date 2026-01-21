@@ -8,7 +8,8 @@ class Settings:
     DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./todo_app.db")
 
     # Environment setting - defaults to 'production' for deployed environments
-    ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+    # Vercel sets VERCEL environment variable
+    ENVIRONMENT = os.getenv("VERCEL_ENV", os.getenv("ENVIRONMENT", "development"))
 
     # Additional settings can be added here
     SECRET_KEY = os.getenv("SECRET_KEY", "your-default-secret-key-change-in-production")
