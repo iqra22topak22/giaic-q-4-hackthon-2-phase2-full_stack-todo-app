@@ -44,3 +44,16 @@ Until you configure a proper PostgreSQL database and set the environment variabl
    - `SECRET_KEY`: A strong secret key for JWT tokens
    - `ENVIRONMENT`: production
 5. Redeploy your project after adding these variables
+
+## Alternative Solution: Use Railway or Render for Backend
+If you continue to face issues with Vercel, consider deploying your backend to platforms better suited for persistent applications:
+- Railway: https://railway.app
+- Render: https://render.com
+
+These platforms provide better support for FastAPI applications with persistent databases.
+
+## Troubleshooting
+If the backend continues to show FUNCTION_INVOCATION_FAILED errors:
+1. Check the Vercel logs in your dashboard for detailed error messages
+2. Ensure all required dependencies are listed in requirements.txt
+3. Consider using a simpler framework like Flask for serverless deployment if FastAPI proves problematic
