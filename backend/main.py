@@ -13,26 +13,9 @@ load_dotenv()
 # Get frontend origin from environment variable, with a default for development
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:3000")
 
-import asyncio
-import threading
-
-# Global lock to prevent multiple initializations
-initialization_lock = threading.Lock()
-_initialized = False
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global _initialized
-    # Startup
-    # For Vercel deployments with SQLite, skip table creation since it's ephemeral
-    if not (settings.DATABASE_URL.startswith("sqlite") and settings.ENVIRONMENT == "production"):
-        with initialization_lock:
-            if not _initialized:
-                try:
-                    await create_db_and_tables()
-                    _initialized = True
-                except Exception as e:
-                    print(f"Database initialization error: {e}")
+    # Startup - defer any initialization to when it's actually needed
     yield
     # Shutdown (if needed)
 
