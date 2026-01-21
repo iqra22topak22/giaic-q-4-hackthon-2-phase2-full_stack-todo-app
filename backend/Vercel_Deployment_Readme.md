@@ -34,3 +34,13 @@ For local development, the application will continue to use SQLite as configured
 
 ## Important Note
 Until you configure a proper PostgreSQL database and set the environment variables in your Vercel project, the backend will continue to show 500 errors. The frontend has been deployed and is working correctly, but it will not be able to communicate with the backend until these changes are made.
+
+## Steps to Fix Backend 500 Error
+1. Go to your Vercel dashboard: https://vercel.com/dashboard
+2. Navigate to your backend project
+3. Go to Settings > Environment Variables
+4. Add the following variables:
+   - `DATABASE_URL`: PostgreSQL database URL (e.g., postgresql://user:password@host:port/database)
+   - `SECRET_KEY`: A strong secret key for JWT tokens
+   - `ENVIRONMENT`: production
+5. Redeploy your project after adding these variables
