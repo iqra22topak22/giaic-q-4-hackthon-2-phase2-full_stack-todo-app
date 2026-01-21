@@ -14,14 +14,8 @@ os.environ.setdefault('DATABASE_URL', 'sqlite+aiosqlite:///:memory:')  # Use in-
 import asyncio
 
 # Import the app from vercel_compatible_main (our new Vercel-friendly version)
-try:
-    from vercel_compatible_main import app
-except ImportError as e:
-    # If vercel_compatible_main import fails, fall back to minimal_main, then main
-    try:
-        from minimal_main import app
-    except ImportError:
-        from main import app
+# This version uses in-memory storage to avoid database issues on Vercel
+from vercel_compatible_main import app
 
 # For Vercel Python runtime
 application = app
