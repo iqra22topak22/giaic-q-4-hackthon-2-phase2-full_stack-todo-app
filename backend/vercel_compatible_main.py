@@ -1,10 +1,10 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
+from pydantic import BaseModel
 import os
 from datetime import datetime
-import asyncio
 
 # In-memory storage for tasks (will reset on each cold start)
 tasks_storage = {}
