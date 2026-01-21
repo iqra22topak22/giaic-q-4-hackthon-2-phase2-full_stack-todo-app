@@ -12,7 +12,7 @@ os.environ.setdefault('DATABASE_URL', 'sqlite+aiosqlite:///:memory:')  # Use in-
 
 # Import required modules first
 import asyncio
-from main import app
+from minimal_main import app
 
 # For Vercel Python runtime
 application = app
