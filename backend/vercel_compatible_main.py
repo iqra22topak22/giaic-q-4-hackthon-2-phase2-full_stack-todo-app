@@ -34,6 +34,12 @@ app.add_middleware(
         "http://127.0.0.1:3000",  # Alternative localhost format
         "http://localhost:8000",  # Backend server (for browser requests)
         "http://127.0.0.1:8000", # Alternative localhost format
+        "https://full-stack-todo-iqra22topak22s-projects.vercel.app",  # Production Vercel URL
+        "https://full-stack-todo-eta.vercel.app",  # Main alias
+        "https://full-stack-todo-cxdbrdr8s-iqra22topak22s-projects.vercel.app",  # Latest deployment
+        "https://full-stack-todo-qfzzohhhm-iqra22topak22s-projects.vercel.app",  # Current deployment
+        "https://full-stack-todo-pqznvemgs-iqra22topak22s-projects.vercel.app",  # Current deployment
+        "https://full-stack-todo-dtleggcil-iqra22topak22s-projects.vercel.app",  # Current deployment
         FRONTEND_ORIGIN,  # Production frontend origin from environment variable
     ],
     allow_credentials=True,
