@@ -13,6 +13,6 @@
     }
   ],
   "env": {
-    "NEXT_PUBLIC_BACKEND_API_URL": "https://backend-r27iejmdy-iqra22topak22s-projects.vercel.app"
+    "NEXT_PUBLIC_BACKEND_API_URL": "https://backend-virid-phi-36.vercel.app"
   }
 }
