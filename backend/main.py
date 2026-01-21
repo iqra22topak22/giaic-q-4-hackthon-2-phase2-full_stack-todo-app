@@ -9,6 +9,9 @@ from app.exceptions import add_exception_handlers
 
 load_dotenv()
 
+# Get frontend origin from environment variable, with a default for development
+FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:3000")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
@@ -24,7 +27,6 @@ app = FastAPI(
 )
 
 # Configure CORS middleware
-# For production deployment, replace "*" with your actual frontend domain
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -32,7 +34,7 @@ app.add_middleware(
         "http://127.0.0.1:3000",  # Alternative localhost format
         "http://localhost:8000",  # Backend server (for browser requests)
         "http://127.0.0.1:8000", # Alternative localhost format
-        "*"  # Allow all in development (update for production)
+        FRONTEND_ORIGIN,  # Production frontend origin from environment variable
     ],
     allow_credentials=True,
     allow_methods=["*"],
