@@ -15,22 +15,8 @@ FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:3000")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup - initialize database tables when the app starts
-    # For Vercel, this will run for each cold start
-    try:
-        import asyncio
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        # If no event loop is running, create a temporary one
-        import asyncio
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(create_db_and_tables())
-        loop.close()
-        # Reinitialize with the proper event loop
-        await create_db_and_tables()
-    else:
-        await create_db_and_tables()
+    # Startup - defer database initialization to when it's actually needed
+    # For Vercel serverless functions, we'll initialize the database per request as needed
     yield
     # Shutdown (if needed)
 
