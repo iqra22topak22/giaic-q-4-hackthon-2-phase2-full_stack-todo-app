@@ -10,8 +10,8 @@ sys.path.insert(0, str(project_root))
 os.environ.setdefault('ENVIRONMENT', 'production')
 os.environ.setdefault('DATABASE_URL', 'sqlite+aiosqlite:///:memory:')  # Use in-memory DB for Vercel
 
-# Import the FastAPI app
-from main import app
+# Import the FastAPI app from our simple test version
+from simple_test_main import app
 
 # Vercel expects the application to be named 'app'
 # This is the entry point for Vercel's Python runtime
