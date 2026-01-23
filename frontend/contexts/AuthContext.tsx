@@ -3,10 +3,11 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { UserSession } from '../lib/types';
+import { jwtDecode } from 'jwt-decode';
 
 interface AuthContextType {
   userSession: UserSession | null;
-  login: (token: string, userId: string) => void;
+  login: (token: string, userId?: string) => void;
   logout: () => void;
   signup: (email: string, password: string) => Promise<boolean>;
 }
@@ -19,37 +20,60 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Check if user is already logged in on initial load
     const token = localStorage.getItem('jwt_token');
-    const userId = localStorage.getItem('user_id');
 
-    if (token && userId) {
-      const session: UserSession = {
-        userId,
-        token,
-        expiresAt: new Date(localStorage.getItem('token_expires_at') || Date.now()),
-        isAuthenticated: true,
-      };
-      setUserSession(session);
+    if (token) {
+      try {
+        // Decode the JWT to get the user ID
+        const decodedToken: any = jwtDecode(token);
+        const userId = decodedToken.sub; // 'sub' is the subject claim, usually the user ID
+
+        const session: UserSession = {
+          userId,
+          token,
+          expiresAt: new Date(decodedToken.exp * 1000), // Convert Unix timestamp to JS Date
+          isAuthenticated: true,
+        };
+        setUserSession(session);
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        // If there's an error decoding the token, clear it
+        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('token_expires_at');
+      }
     }
   }, []);
 
-  const login = (token: string, userId: string) => {
-    // Calculate expiration time (assuming token is valid for 24 hours)
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 1); // 24 hours from now
+  const login = (token: string, userId?: string) => {
+    try {
+      // Decode the JWT to get the user ID if not provided
+      let actualUserId = userId;
+      if (!actualUserId) {
+        const decodedToken: any = jwtDecode(token);
+        actualUserId = decodedToken.sub; // 'sub' is the subject claim, usually the user ID
+      }
 
-    const session: UserSession = {
-      userId,
-      token,
-      expiresAt,
-      isAuthenticated: true,
-    };
+      // Get expiration time from the token
+      const decodedToken: any = jwtDecode(token);
+      const expiresAt = new Date(decodedToken.exp * 1000); // Convert Unix timestamp to JS Date
 
-    // Store in localStorage
-    localStorage.setItem('jwt_token', token);
-    localStorage.setItem('user_id', userId);
-    localStorage.setItem('token_expires_at', expiresAt.toISOString());
+      const session: UserSession = {
+        userId: actualUserId,
+        token,
+        expiresAt,
+        isAuthenticated: true,
+      };
 
-    setUserSession(session);
+      // Store in localStorage
+      localStorage.setItem('jwt_token', token);
+      localStorage.setItem('user_id', actualUserId);
+      localStorage.setItem('token_expires_at', expiresAt.toISOString());
+
+      setUserSession(session);
+    } catch (error) {
+      console.error('Error during login:', error);
+      throw new Error('Invalid token');
+    }
   };
 
   const logout = () => {

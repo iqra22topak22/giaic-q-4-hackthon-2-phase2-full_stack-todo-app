@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
+import apiClient from '../lib/api-client';
 
 export default function Login() {
   const router = useRouter();
@@ -18,27 +19,28 @@ export default function Login() {
     setError('');
 
     try {
-      // In development mode, we'll use mock-user-id
-      if (process.env.NODE_ENV === 'development') {
-        // Use the auth context to handle login
-        login('mock-jwt-token', 'mock-user-id');
-        // Redirect to dashboard after successful login
-        router.push('/dashboard');
-      } else {
-        // In production, you would make an actual API call here
-        // const response = await fetch('/api/login', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({ email, password })
-        // });
-        // const data = await response.json();
+      // Make actual API call to backend
+      const response = await apiClient.post('/api/auth/auth/login', {
+        username: email, // Using email as username for simplicity
+        password
+      });
 
-        // For now, simulate a successful login with mock data
-        login('mock-jwt-token', 'user-123');
-        router.push('/dashboard');
+      const { access_token } = response.data;
+
+      // Use the auth context to handle login
+      // The AuthContext will decode the JWT to extract the user ID
+      login(access_token);
+
+      // Redirect to dashboard after successful login
+      router.push('/dashboard');
+    } catch (err: any) {
+      if (err.response) {
+        setError(err.response.data.detail || 'Invalid email or password. Please try again.');
+      } else if (err.request) {
+        setError('Network error: Unable to connect to the server. Please check your connection.');
+      } else {
+        setError('An error occurred. Please try again.');
       }
-    } catch (err) {
-      setError('Invalid email or password. Please try again.');
       console.error('Login error:', err);
     } finally {
       setIsLoading(false);

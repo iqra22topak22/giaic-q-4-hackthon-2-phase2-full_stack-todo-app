@@ -232,17 +232,17 @@ export default function Dashboard() {
                 {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'} • {pendingTasks.length} pending
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button
                 onClick={() => setShowBulkForm(true)}
-                className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 px-4 py-2 rounded-lg transition-all transform hover:scale-105"
+                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white flex items-center gap-2 px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-md"
               >
                 <Upload className="h-4 w-4" />
                 <span>Bulk Add</span>
               </Button>
               <Button
                 onClick={() => setShowAddForm(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 px-4 py-2 rounded-lg transition-all transform hover:scale-105"
+                className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white flex items-center gap-2 px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-md"
               >
                 <Plus className="h-4 w-4" />
                 <span>Add Task</span>
@@ -274,7 +274,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 transition-all duration-300 hover:shadow-2xl border border-gray-200 dark:border-gray-700">
             <TaskList
               tasks={tasks}
               loading={loading}

@@ -74,6 +74,48 @@ async def get_tasks(
             limit=limit,
             offset=offset
         )
+    elif settings.ENVIRONMENT == "local_with_db":
+        # Use database in local development with database
+        # Build query with user_id filter
+        query = select(Task).where(Task.user_id == validated_user_id)
+
+        # Apply completion filter if specified
+        if completed is not None:
+            query = query.where(Task.completed == completed)
+
+        # Apply pagination
+        query = query.offset(offset).limit(limit)
+
+        result = await db.exec(query)
+        tasks = result.all()
+
+        # Get total count for pagination metadata
+        count_query = select(Task).where(Task.user_id == validated_user_id)
+        if completed is not None:
+            count_query = count_query.where(Task.completed == completed)
+        count_result = await db.exec(count_query)
+        total_count = len(count_result.all())
+
+        # Convert to response format
+        task_responses = [
+            TaskResponse(
+                id=task.id,
+                user_id=task.user_id,
+                title=task.title,
+                description=task.description,
+                completed=task.completed,
+                created_at=task.created_at,
+                updated_at=task.updated_at
+            )
+            for task in tasks
+        ]
+
+        return TaskListResponse(
+            tasks=task_responses,
+            total_count=total_count,
+            limit=limit,
+            offset=offset
+        )
     else:
         # Use database in production
         # Build query with user_id filter
@@ -170,6 +212,26 @@ async def create_task(
                 "updated_at": saved_task.updated_at.isoformat()
             }
         )
+    elif settings.ENVIRONMENT == "local_with_db":
+        # Use database in local development with database
+        # Add to database
+        db.add(task)
+        await db.commit()
+        await db.refresh(task)
+
+        return SuccessResponse(
+            success=True,
+            message="Task created successfully",
+            data={
+                "id": task.id,
+                "user_id": task.user_id,
+                "title": task.title,
+                "description": task.description,
+                "completed": task.completed,
+                "created_at": task.created_at.isoformat(),
+                "updated_at": task.updated_at.isoformat()
+            }
+        )
     else:
         # Use database in production
         # Add to database
@@ -209,6 +271,32 @@ async def get_task(
     if settings.ENVIRONMENT == "development":
         # Use in-memory storage in development
         task = get_task_for_user(validated_user_id, task_id)
+
+        if not task:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Task not found or does not belong to the user"
+            )
+
+        return SuccessResponse(
+            success=True,
+            data={
+                "id": task.id,
+                "user_id": task.user_id,
+                "title": task.title,
+                "description": task.description,
+                "completed": task.completed,
+                "created_at": task.created_at.isoformat(),
+                "updated_at": task.updated_at.isoformat()
+            }
+        )
+    elif settings.ENVIRONMENT == "local_with_db":
+        # Use database in local development with database
+        # Query for the task with user_id filter to ensure ownership
+        result = await db.exec(
+            select(Task).where(Task.id == task_id).where(Task.user_id == validated_user_id)
+        )
+        task = result.first()
 
         if not task:
             raise HTTPException(
@@ -331,6 +419,61 @@ async def update_task(
                 "updated_at": updated_task.updated_at.isoformat()
             }
         )
+    elif settings.ENVIRONMENT == "local_with_db":
+        # Use database in local development with database
+        # Query for the task with user_id filter to ensure ownership
+        result = await db.exec(
+            select(Task).where(Task.id == task_id).where(Task.user_id == validated_user_id)
+        )
+        task = result.first()
+
+        if not task:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Task not found or does not belong to the user"
+            )
+
+        # Validate input if provided
+        if task_update.title is not None:
+            if not validate_task_title(task_update.title):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Title must be between 1 and 255 characters"
+                )
+            task.title = task_update.title
+
+        if task_update.description is not None:
+            if not validate_task_description(task_update.description):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Description must be 1000 characters or less"
+                )
+            task.description = task_update.description
+
+        if task_update.completed is not None:
+            task.completed = task_update.completed
+
+        # Update the updated_at timestamp
+        task.updated_at = datetime.utcnow()
+
+        # Commit changes
+        db.add(task)
+        await db.commit()
+        await db.refresh(task)
+
+        return SuccessResponse(
+            success=True,
+            message="Task updated successfully",
+            data={
+                "id": task.id,
+                "user_id": task.user_id,
+                "title": task.title,
+                "description": task.description,
+                "completed": task.completed,
+                "created_at": task.created_at.isoformat(),
+                "updated_at": task.updated_at.isoformat()
+            }
+        )
     else:
         # Use database in production
         # Query for the task with user_id filter to ensure ownership
@@ -416,6 +559,28 @@ async def delete_task(
             success=True,
             message="Task deleted successfully"
         )
+    elif settings.ENVIRONMENT == "local_with_db":
+        # Use database in local development with database
+        # Query for the task with user_id filter to ensure ownership
+        result = await db.exec(
+            select(Task).where(Task.id == task_id).where(Task.user_id == validated_user_id)
+        )
+        task = result.first()
+
+        if not task:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Task not found or does not belong to the user"
+            )
+
+        # Delete the task
+        await db.delete(task)
+        await db.commit()
+
+        return SuccessResponse(
+            success=True,
+            message="Task deleted successfully"
+        )
     else:
         # Use database in production
         # Query for the task with user_id filter to ensure ownership
@@ -483,6 +648,42 @@ async def toggle_task_completion(
                 "completed": updated_task.completed,
                 "created_at": updated_task.created_at.isoformat(),
                 "updated_at": updated_task.updated_at.isoformat()
+            }
+        )
+    elif settings.ENVIRONMENT == "local_with_db":
+        # Use database in local development with database
+        # Query for the task with user_id filter to ensure ownership
+        result = await db.exec(
+            select(Task).where(Task.id == task_id).where(Task.user_id == validated_user_id)
+        )
+        task = result.first()
+
+        if not task:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Task not found or does not belong to the user"
+            )
+
+        # Update the completion status
+        task.completed = completion_data.completed
+        task.updated_at = datetime.utcnow()
+
+        # Commit changes
+        db.add(task)
+        await db.commit()
+        await db.refresh(task)
+
+        return SuccessResponse(
+            success=True,
+            message="Task completion status updated successfully",
+            data={
+                "id": task.id,
+                "user_id": task.user_id,
+                "title": task.title,
+                "description": task.description,
+                "completed": task.completed,
+                "created_at": task.created_at.isoformat(),
+                "updated_at": task.updated_at.isoformat()
             }
         )
     else:

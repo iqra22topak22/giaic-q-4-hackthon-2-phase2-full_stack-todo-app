@@ -26,8 +26,26 @@ class TaskResponse(TaskBase):
     updated_at: datetime
 
 
+class TaskWithUserEmailResponse(BaseModel):
+    id: int
+    user_id: str
+    title: str
+    description: Optional[str] = None
+    completed: bool
+    created_at: datetime
+    updated_at: datetime
+    user_email: Optional[str] = None
+
+
 class TaskListResponse(BaseModel):
     tasks: List[TaskResponse]
+    total_count: int
+    limit: int
+    offset: int
+
+
+class TaskListWithUserEmailResponse(BaseModel):
+    tasks: List[TaskWithUserEmailResponse]
     total_count: int
     limit: int
     offset: int

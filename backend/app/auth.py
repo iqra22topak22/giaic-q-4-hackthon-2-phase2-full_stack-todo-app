@@ -105,7 +105,7 @@ def get_current_user_optional(credentials: HTTPAuthorizationCredentials = Depend
     If no token is provided or invalid, return a default user ID.
     In development, also allow mock-user-id without a token.
     """
-    if settings.ENVIRONMENT == "development":
+    if settings.ENVIRONMENT in ["development", "local_with_db"]:
         try:
             token = credentials.credentials
             payload = verify_token(token)
@@ -150,7 +150,7 @@ def get_current_user_dev_bypass(user_id: str = None) -> str:
     Development-only function to bypass authentication and return the user_id directly.
     This allows mock-user-id to be used without a token in development.
     """
-    if settings.ENVIRONMENT == "development":
+    if settings.ENVIRONMENT in ["development", "local_with_db"]:
         # If user_id is provided and is "mock-user-id", return it directly
         if user_id and user_id == "mock-user-id":
             return user_id
@@ -170,7 +170,7 @@ def get_user_id_or_mock(user_id: str) -> str:
     otherwise performs normal authentication.
     This is used for path parameters in development.
     """
-    if settings.ENVIRONMENT == "development" and user_id == "mock-user-id":
+    if settings.ENVIRONMENT in ["development", "local_with_db"] and user_id == "mock-user-id":
         return user_id
     else:
         # In production or for other user IDs, require proper authentication
@@ -186,7 +186,7 @@ def get_authenticated_user_id_from_path():
     In production, proper authentication is required.
     """
     async def dependency(request: Request, user_id: str = Path(...)):
-        if settings.ENVIRONMENT.lower() == "development" and user_id == "mock-user-id":
+        if settings.ENVIRONMENT.lower() in ["development", "local_with_db"] and user_id == "mock-user-id":
             # In development, allow mock-user-id without authentication
             return user_id
         else:
@@ -211,7 +211,7 @@ def get_authenticated_user_id_from_path():
 
                 credentials = HTTPAuthorizationCredentials(scheme=scheme, credentials=param)
 
-                if settings.ENVIRONMENT.lower() == "development":
+                if settings.ENVIRONMENT.lower() in ["development", "local_with_db"]:
                     # In development, with credentials provided, validate them
                     try:
                         token = credentials.credentials
@@ -256,7 +256,7 @@ def get_authenticated_user_id_from_path():
                         )
             else:
                 # No authorization header provided
-                if settings.ENVIRONMENT.lower() == "development":
+                if settings.ENVIRONMENT.lower() in ["development", "local_with_db"]:
                     # In development, return the path user ID if no auth header is provided
                     return user_id
                 else:
@@ -277,7 +277,7 @@ def get_authenticated_user_id(path_user_id: str):
     In production, proper authentication is required.
     """
     async def dependency(request):
-        if settings.ENVIRONMENT.lower() == "development" and path_user_id == "mock-user-id":
+        if settings.ENVIRONMENT.lower() in ["development", "local_with_db"] and path_user_id == "mock-user-id":
             # In development, allow mock-user-id without authentication
             return path_user_id
         else:
@@ -302,7 +302,7 @@ def get_authenticated_user_id(path_user_id: str):
 
                 credentials = HTTPAuthorizationCredentials(scheme=scheme, credentials=param)
 
-                if settings.ENVIRONMENT.lower() == "development":
+                if settings.ENVIRONMENT.lower() in ["development", "local_with_db"]:
                     # In development, with credentials provided, validate them
                     try:
                         token = credentials.credentials
@@ -347,7 +347,7 @@ def get_authenticated_user_id(path_user_id: str):
                         )
             else:
                 # No authorization header provided
-                if settings.ENVIRONMENT.lower() == "development":
+                if settings.ENVIRONMENT.lower() in ["development", "local_with_db"]:
                     # In development, return the path user ID if no auth header is provided
                     return path_user_id
                 else:

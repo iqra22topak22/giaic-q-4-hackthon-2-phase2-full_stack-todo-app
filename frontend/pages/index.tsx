@@ -18,7 +18,7 @@ export default function Home() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
       <Head>
         <title>Welcome - Todo App</title>
         <meta name="description" content="Welcome to the Todo App" />
@@ -27,25 +27,31 @@ export default function Home() {
 
       <div className="w-full max-w-md text-center">
         <div className="mb-10">
-          <div className="mx-auto bg-blue-600 w-16 h-16 rounded-xl flex items-center justify-center mb-4">
-            <h1 className="text-2xl font-bold text-white">Todo</h1>
+          <div className="mx-auto bg-gradient-to-r from-blue-500 to-indigo-600 w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+            <h1 className="text-3xl font-bold text-white">Todo</h1>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800">Welcome to Todo App</h1>
-          <p className="text-gray-600 mt-2">Organize your tasks efficiently</p>
+          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-3">Welcome to Todo App</h1>
+          <p className="text-gray-600 dark:text-gray-300 text-lg">Organize your tasks efficiently</p>
         </div>
 
         <div className="space-y-4">
           <Link href="/login">
-            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition duration-200 transform hover:scale-[1.02]">
+            <button className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white py-4 px-6 rounded-xl font-semibold text-base transition-all duration-300 transform hover:scale-[1.02] shadow-lg">
               Sign In
             </button>
           </Link>
 
           <Link href="/signup">
-            <button className="w-full bg-white hover:bg-gray-100 text-gray-800 border border-gray-300 py-3 px-4 rounded-lg font-medium transition duration-200 transform hover:scale-[1.02]">
+            <button className="w-full bg-gradient-to-r from-white to-gray-100 dark:from-gray-800 dark:to-gray-700 hover:from-gray-100 hover:to-gray-200 dark:hover:from-gray-700 dark:hover:to-gray-600 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 py-4 px-6 rounded-xl font-semibold text-base transition-all duration-300 transform hover:scale-[1.02] shadow-lg">
               Sign Up
             </button>
           </Link>
+        </div>
+
+        <div className="mt-8 text-center">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            By signing up, you agree to our Terms and Privacy Policy.
+          </p>
         </div>
       </div>
     </div>

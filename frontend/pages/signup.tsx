@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
+import apiClient from '../lib/api-client';
 
 export default function Signup() {
   const router = useRouter();
@@ -34,27 +35,29 @@ export default function Signup() {
     }
 
     try {
-      // In development mode, we'll use mock-user-id
-      if (process.env.NODE_ENV === 'development') {
-        // Use the auth context to handle login
-        login('mock-jwt-token', 'mock-user-id');
-        // Redirect to dashboard after successful signup
-        router.push('/dashboard');
-      } else {
-        // In production, you would make an actual API call here
-        // const response = await fetch('/api/signup', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({ name, email, password })
-        // });
-        // const data = await response.json();
+      // Make actual API call to backend
+      const response = await apiClient.post('/api/auth/auth/register', {
+        username: name, // Using name as username
+        email,
+        password
+      });
 
-        // For now, simulate a successful signup with mock data
-        login('mock-jwt-token', 'user-123');
-        router.push('/dashboard');
+      const { access_token } = response.data;
+
+      // Use the auth context to handle login
+      // The AuthContext will decode the JWT to extract the user ID
+      login(access_token);
+
+      // Redirect to dashboard after successful signup
+      router.push('/dashboard');
+    } catch (err: any) {
+      if (err.response) {
+        setError(err.response.data.detail || 'An error occurred during signup. Please try again.');
+      } else if (err.request) {
+        setError('Network error: Unable to connect to the server. Please check your connection.');
+      } else {
+        setError('An error occurred. Please try again.');
       }
-    } catch (err) {
-      setError('An error occurred during signup. Please try again.');
       console.error('Signup error:', err);
     } finally {
       setIsLoading(false);

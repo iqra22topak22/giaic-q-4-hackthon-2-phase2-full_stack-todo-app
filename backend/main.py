@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.api.v1.tasks import router as tasks_router
+from app.user_auth.router import router as auth_router
 from app.database import engine, create_db_and_tables
 from contextlib import asynccontextmanager
 import os
@@ -13,10 +14,12 @@ load_dotenv()
 # Get frontend origin from environment variable, with a default for development
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:3000")
 
+from app.database import create_db_and_tables
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup - defer database initialization to when it's actually needed
-    # For Vercel serverless functions, we'll initialize the database per request as needed
+    # Startup - create database tables
+    await create_db_and_tables()
     yield
     # Shutdown (if needed)
 
@@ -49,6 +52,7 @@ add_exception_handlers(app)
 
 # Include routers
 app.include_router(tasks_router, prefix="/api/{user_id}", tags=["tasks"])
+app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 
 @app.get("/")
 def read_root():

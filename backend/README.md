@@ -28,11 +28,34 @@ This is the backend API for the Todo Web Application, built with FastAPI and SQL
 
 2. Set up environment variables in a `.env` file:
    ```
-   DATABASE_URL=postgresql+psycopg2://username:password@host:port/database_name
+   # For local development with SQLite:
+   DATABASE_URL=sqlite+aiosqlite:///./todo_app.db
+
+   # For production with Neon PostgreSQL, use your actual connection string:
+   # DATABASE_URL=postgresql+asyncpg://username:password@ep-xxx-neon-project-name.region.provider.neon.tech/dbname
+
    BETTER_AUTH_SECRET=your_better_auth_shared_secret
    BETTER_AUTH_URL=https://your-app.better-auth.com
    ENVIRONMENT=development
    ```
+
+## Configuring Neon PostgreSQL
+
+To use Neon as your database:
+
+1. Create a Neon account at [neon.tech](https://neon.tech)
+2. Create a new project in Neon
+3. Copy your connection string from the Neon dashboard
+4. Update your `.env` file with the actual connection string:
+   ```
+   DATABASE_URL=postgresql+asyncpg://username:password@ep-xxx-neon-project-name.region.provider.neon.tech/dbname
+   ```
+5. Make sure to install the required dependencies:
+   ```bash
+   pip install asyncpg
+   ```
+
+## Setup (continued)
 
 3. Run the application:
    ```bash

@@ -16,7 +16,6 @@ const Sidebar = () => {
 
   const navigation: NavItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-    { name: 'Tasks', href: '/tasks', icon: TaskIcon },
     { name: 'Profile', href: '/profile', icon: ProfileIcon },
   ];
 

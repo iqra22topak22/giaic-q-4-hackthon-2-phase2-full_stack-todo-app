@@ -1,24 +1,42 @@
 from datetime import datetime, timedelta
 from typing import Optional
 import jwt
-from passlib.context import CryptContext
 from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.config import settings
 
-# Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+import hashlib
+import secrets
 
 # JWT security scheme
 security = HTTPBearer(auto_error=False)
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a plain password against its hash."""
-    return pwd_context.verify(plain_password, hashed_password)
-
 def get_password_hash(password: str) -> str:
-    """Generate a hash for the given password."""
-    return pwd_context.hash(password)
+    """Generate a hash for the given password using SHA-256 with salt."""
+    # Generate a random salt
+    salt = secrets.token_hex(16)
+    # Combine password and salt
+    pwd_salt = password + salt
+    # Hash the combination
+    hashed_pwd = hashlib.sha256(pwd_salt.encode()).hexdigest()
+    # Return salt + hashed password (first 32 chars for salt, rest for hash)
+    return salt + hashed_pwd
+
+def verify_password(plain_password: str, salted_hashed_password: str) -> bool:
+    """Verify a plain password against its salted hash."""
+    if len(salted_hashed_password) < 32:  # Minimum length for salt
+        return False
+
+    # Extract salt (first 32 characters, which represents 16 bytes in hex)
+    salt = salted_hashed_password[:32]
+    stored_hash = salted_hashed_password[32:]
+
+    # Hash the input password with the same salt
+    pwd_salt = plain_password + salt
+    hashed_input = hashlib.sha256(pwd_salt.encode()).hexdigest()
+
+    # Compare the hashes
+    return hashed_input == stored_hash
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     """Create a JWT access token."""

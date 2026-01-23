@@ -27,3 +27,10 @@ class UserResponse(BaseModel):
     username: str
     email: str
     is_active: bool
+
+
+class UserPublic(BaseModel):
+    id: int
+    username: str
+    email: str
+    is_active: bool

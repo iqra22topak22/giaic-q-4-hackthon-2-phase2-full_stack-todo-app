@@ -52,22 +52,22 @@ export default function TaskList({ tasks, loading, error, onToggle, onDelete, on
   return (
     <div className="mt-6">
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-700 p-1 mb-6">
+        <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-700 p-1 mb-6 rounded-xl">
           <TabsTrigger
             value="all"
-            className="data-[state=active]:bg-white data-[state=active]:text-blue-600 dark:data-[state=active]:bg-gray-800 dark:data-[state=active]:text-blue-400 rounded-md"
+            className="data-[state=active]:bg-white data-[state=active]:text-blue-600 dark:data-[state=active]:bg-gray-800 dark:data-[state=active]:text-blue-400 rounded-lg transition-all"
           >
             All ({tasks.length})
           </TabsTrigger>
           <TabsTrigger
             value="pending"
-            className="data-[state=active]:bg-white data-[state=active]:text-blue-600 dark:data-[state=active]:bg-gray-800 dark:data-[state=active]:text-blue-400 rounded-md"
+            className="data-[state=active]:bg-white data-[state=active]:text-blue-600 dark:data-[state=active]:bg-gray-800 dark:data-[state=active]:text-blue-400 rounded-lg transition-all"
           >
             Pending ({pendingTasks.length})
           </TabsTrigger>
           <TabsTrigger
             value="completed"
-            className="data-[state=active]:bg-white data-[state=active]:text-blue-600 dark:data-[state=active]:bg-gray-800 dark:data-[state=active]:text-blue-400 rounded-md"
+            className="data-[state=active]:bg-white data-[state=active]:text-blue-600 dark:data-[state=active]:bg-gray-800 dark:data-[state=active]:text-blue-400 rounded-lg transition-all"
           >
             Completed ({completedTasks.length})
           </TabsTrigger>
@@ -75,17 +75,24 @@ export default function TaskList({ tasks, loading, error, onToggle, onDelete, on
 
         <TabsContent value="all" className="space-y-4 mt-0">
           {tasks.length > 0 ? (
-            tasks.map(task => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                onToggle={onToggle}
-                onDelete={onDelete}
-                onUpdate={onUpdate}
-              />
-            ))
+            <div className="grid grid-cols-1 gap-4">
+              {tasks.map((task, index) => (
+                <div
+                  key={task.id}
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
+                  <TaskCard
+                    task={task}
+                    onToggle={onToggle}
+                    onDelete={onDelete}
+                    onUpdate={onUpdate}
+                  />
+                </div>
+              ))}
+            </div>
           ) : (
-            <div className="text-center py-12">
+            <div className="text-center py-12 animate-fade-in">
               <div className="mx-auto h-16 w-16 text-gray-400 dark:text-gray-500">
                 <Info className="h-full w-full" />
               </div>
@@ -99,17 +106,24 @@ export default function TaskList({ tasks, loading, error, onToggle, onDelete, on
 
         <TabsContent value="pending" className="space-y-4 mt-0">
           {pendingTasks.length > 0 ? (
-            pendingTasks.map(task => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                onToggle={onToggle}
-                onDelete={onDelete}
-                onUpdate={onUpdate}
-              />
-            ))
+            <div className="grid grid-cols-1 gap-4">
+              {pendingTasks.map((task, index) => (
+                <div
+                  key={task.id}
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
+                  <TaskCard
+                    task={task}
+                    onToggle={onToggle}
+                    onDelete={onDelete}
+                    onUpdate={onUpdate}
+                  />
+                </div>
+              ))}
+            </div>
           ) : (
-            <div className="text-center py-12">
+            <div className="text-center py-12 animate-fade-in">
               <div className="mx-auto h-16 w-16 text-gray-400 dark:text-gray-500">
                 <Info className="h-full w-full" />
               </div>
@@ -123,17 +137,24 @@ export default function TaskList({ tasks, loading, error, onToggle, onDelete, on
 
         <TabsContent value="completed" className="space-y-4 mt-0">
           {completedTasks.length > 0 ? (
-            completedTasks.map(task => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                onToggle={onToggle}
-                onDelete={onDelete}
-                onUpdate={onUpdate}
-              />
-            ))
+            <div className="grid grid-cols-1 gap-4">
+              {completedTasks.map((task, index) => (
+                <div
+                  key={task.id}
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
+                  <TaskCard
+                    task={task}
+                    onToggle={onToggle}
+                    onDelete={onDelete}
+                    onUpdate={onUpdate}
+                  />
+                </div>
+              ))}
+            </div>
           ) : (
-            <div className="text-center py-12">
+            <div className="text-center py-12 animate-fade-in">
               <div className="mx-auto h-16 w-16 text-gray-400 dark:text-gray-500">
                 <Info className="h-full w-full" />
               </div>
