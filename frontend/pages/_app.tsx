@@ -7,7 +7,7 @@ import { ThemeProvider } from '../contexts/theme-context';
 import { AuthProvider } from '../contexts/AuthContext';
 
 // Pages that don't require authentication
-const publicPages = ['/', '/login', '/signup'];
+const publicPages = ['/', '/login', '/signup', '/clear-auth'];
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();

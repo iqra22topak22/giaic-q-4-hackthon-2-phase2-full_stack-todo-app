@@ -43,12 +43,50 @@ export const isAuthenticated = (): boolean => {
     return false;
   }
 
-  // Check if the token has expired
+  // Check if the token has expired based on the stored expiration time
   const expiresAt = storage.getItem('token_expires_at');
   if (expiresAt) {
-    const expirationDate = new Date(expiresAt);
-    if (expirationDate < new Date()) {
-      // Token has expired, remove it
+    try {
+      const expirationDate = new Date(expiresAt);
+      if (isNaN(expirationDate.getTime())) {
+        // Invalid date format, remove corrupted data
+        storage.removeItem('jwt_token');
+        storage.removeItem('user_id');
+        storage.removeItem('token_expires_at');
+        return false;
+      }
+
+      if (expirationDate < new Date()) {
+        // Token has expired, remove it
+        storage.removeItem('jwt_token');
+        storage.removeItem('user_id');
+        storage.removeItem('token_expires_at');
+        return false;
+      }
+    } catch (error) {
+      // If there's an error parsing the date, remove corrupted data
+      console.error('Error parsing expiration date:', error);
+      storage.removeItem('jwt_token');
+      storage.removeItem('user_id');
+      storage.removeItem('token_expires_at');
+      return false;
+    }
+  }
+
+  // Additional check: try to decode the token to see if it's valid
+  if (typeof window !== 'undefined') {
+    try {
+      const { isTokenExpired } = require('./jwt-utils');
+      if (isTokenExpired(token)) {
+        // Token has expired, remove it
+        storage.removeItem('jwt_token');
+        storage.removeItem('user_id');
+        storage.removeItem('token_expires_at');
+        return false;
+      }
+    } catch (error) {
+      // If there's an error decoding the token, it's invalid
+      console.error('Error decoding token:', error);
       storage.removeItem('jwt_token');
       storage.removeItem('user_id');
       storage.removeItem('token_expires_at');
@@ -94,4 +132,14 @@ export const setMockUserId = (userId: string): void => {
     storage.removeItem('jwt_token');
     storage.removeItem('token_expires_at');
   }
+};
+
+// Function to clear all authentication data
+export const clearAuthData = (): void => {
+  const storage = getLocalStorage();
+  if (!storage) return;
+
+  storage.removeItem('jwt_token');
+  storage.removeItem('user_id');
+  storage.removeItem('token_expires_at');
 };
